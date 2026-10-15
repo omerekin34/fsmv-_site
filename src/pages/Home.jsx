@@ -5,10 +5,10 @@ import Reveal from '../components/Reveal.jsx'
 import StatsBar from '../components/StatsBar.jsx'
 import TeamCard from '../components/TeamCard.jsx'
 import { pageMotion } from '../motion.js'
-import { activities } from '../data/activities.js'
+import { useActivities } from '../hooks/useActivities.js'
 import { announcements, dateParts, getStatus, statusLabel } from '../data/announcements.js'
 import { mission } from '../data/about.js'
-import { board } from '../data/team.js'
+import { useTeam } from '../hooks/useTeam.js'
 import { egyptTour } from '../data/egyptTour.js'
 
 function SectionMore({ to, children }) {
@@ -20,8 +20,10 @@ function SectionMore({ to, children }) {
 }
 
 export default function Home() {
+  const { activities } = useActivities()
   const latest = activities.slice(0, 3)
   const news = announcements.slice(0, 3)
+  const { board } = useTeam()
   return (
     <motion.main {...pageMotion}>
       <section className="hero">
@@ -81,7 +83,7 @@ export default function Home() {
           <Reveal><h2 className="section-title">Ekibimiz</h2>
             <p className="section-sub">Kulübümüze yön veren yönetim kurulumuz</p></Reveal>
           <div className="team-grid">
-            {board.slice(0, 4).map((p, i) => <TeamCard key={p.name} p={p} delay={i * 0.08} />)}
+            {board.slice(0, 4).map((p, i) => <TeamCard key={p.id} p={p} delay={i * 0.08} />)}
           </div>
           <SectionMore to="/ekibimiz">Tüm Ekibi Gör</SectionMore>
         </div>

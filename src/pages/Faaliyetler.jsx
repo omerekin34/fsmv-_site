@@ -3,12 +3,13 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, SlidersHorizontal, MapPin, Users, ArrowRight, X } from 'lucide-react'
 import { pageMotion } from '../motion.js'
-import { activities, categories, months, years } from '../data/activities.js'
+import { months } from '../lib/activities.js'
+import { useActivities } from '../hooks/useActivities.js'
 import Select from '../components/Select.jsx'
 
 const trLower = s => s.toLocaleLowerCase('tr')
 
-function FilterSelects({ y, m, s, setParam }) {
+function FilterSelects({ y, m, s, years, setParam }) {
   return (
     <>
       <Select
@@ -28,6 +29,7 @@ function FilterSelects({ y, m, s, setParam }) {
 }
 
 export default function Faaliyetler() {
+  const { activities, categories, years, loading } = useActivities()
   const [params, setParams] = useSearchParams()
   const [panelOpen, setPanelOpen] = useState(false)
 
@@ -56,7 +58,7 @@ export default function Faaliyetler() {
       return true
     })
     return [...filtered].sort((a, b) => s === 'old' ? a.dateISO.localeCompare(b.dateISO) : b.dateISO.localeCompare(a.dateISO))
-  }, [k, y, m, q, s])
+  }, [activities, k, y, m, q, s])
 
   const active = k !== 'Tümü' || y || m || q || s !== 'new'
   const clear = () => setParams(new URLSearchParams(), { replace: true })
@@ -84,7 +86,7 @@ export default function Faaliyetler() {
                 <SlidersHorizontal size={16} /> Filtrele
               </button>
               <div className="fa-selects fa-selects-desktop">
-                <FilterSelects y={y} m={m} s={s} setParam={setParam} />
+                <FilterSelects y={y} m={m} s={s} years={years} setParam={setParam} />
               </div>
             </div>
             <AnimatePresence initial={false}>
@@ -97,7 +99,7 @@ export default function Faaliyetler() {
                   transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 >
                   <div className="fa-selects">
-                    <FilterSelects y={y} m={m} s={s} setParam={setParam} />
+                    <FilterSelects y={y} m={m} s={s} years={years} setParam={setParam} />
                   </div>
                 </motion.div>
               )}
@@ -116,7 +118,9 @@ export default function Faaliyetler() {
             )}
           </div>
 
-          {list.length === 0 ? (
+          {loading ? (
+            <div className="glass-card fa-empty"><p>Yükleniyor…</p></div>
+          ) : list.length === 0 ? (
             <div className="glass-card fa-empty">
               <p>Bu kriterlere uygun faaliyet bulunamadı.</p>
               <button className="btn btn-outline" onClick={clear}><span>Filtreleri Temizle</span></button>

@@ -5,17 +5,20 @@ import Reveal from '../components/Reveal.jsx'
 import { pageMotion } from '../motion.js'
 import Field from '../components/Field.jsx'
 import { useFormState, validate } from '../hooks/useForm.js'
+import { supabase } from '../lib/supabase.js'
+import { nullIfEmpty, FORM_ERROR } from '../lib/forms.js'
 
 const siniflar = ['Hazırlık', '1. Sınıf', '2. Sınıf', '3. Sınıf', '4. Sınıf', 'Yüksek Lisans']
 const komiteler = ['Akademik', 'Etkinlik', 'Sosyal Medya & Tasarım', 'Sponsorluk', 'Kurgusal Duruşma', 'Halkla İlişkiler']
 
 export default function UyeOl() {
   const [done, setDone] = useState(false)
+  const [sending, setSending] = useState(false)
   const { values, errors, setErrors, onChange } = useFormState({
     ad: '', ogrNo: '', bolum: '', sinif: '', tel: '', email: '', komite: '', motivasyon: '', kvkk: false,
   })
 
-  const submit = e => {
+  const submit = async e => {
     e.preventDefault()
     const errs = validate(values, {
       ad: { required: true }, ogrNo: { required: true }, bolum: { required: true },
@@ -23,7 +26,21 @@ export default function UyeOl() {
       email: { required: true, email: true }, komite: { required: true }, kvkk: { required: true },
     })
     if (Object.keys(errs).length) return setErrors(errs)
-    setTimeout(() => setDone(true), 1000)
+    setSending(true)
+    const { error } = await supabase.from('uyeler').insert({
+      ad_soyad: values.ad,
+      ogrenci_no: values.ogrNo,
+      bolum: values.bolum,
+      sinif: values.sinif,
+      telefon: values.tel,
+      email: values.email,
+      komite: values.komite,
+      motivasyon: nullIfEmpty(values.motivasyon),
+      kvkk_onay: values.kvkk,
+    })
+    setSending(false)
+    if (error) return setErrors({ form: FORM_ERROR })
+    setDone(true)
   }
 
   return (
@@ -65,7 +82,8 @@ export default function UyeOl() {
                     <span>KVKK kapsamında kişisel verilerimin kulüp faaliyetleri ve iletişim amacıyla işlenmesini kabul ediyorum. *</span>
                   </label>
                   {errors.kvkk && <span className="field-error" style={{ display: 'block', marginTop: -12, marginBottom: 14 }}>{errors.kvkk}</span>}
-                  <button className="btn btn-gold" style={{ width: '100%', justifyContent: 'center' }} type="submit"><span>Üyelik Başvurusu Gönder</span></button>
+                  {errors.form && <p className="field-error" style={{ display: 'block', marginBottom: 14 }}>{errors.form}</p>}
+                  <button className="btn btn-gold" style={{ width: '100%', justifyContent: 'center' }} type="submit" disabled={sending}><span>{sending ? 'Gönderiliyor...' : 'Üyelik Başvurusu Gönder'}</span></button>
                 </form>
               )}
             </div>

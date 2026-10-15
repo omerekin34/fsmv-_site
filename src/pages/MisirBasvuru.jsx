@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, CheckCircle2, CornerDownLeft } from 'lucide-react'
 import { pageMotion, ease } from '../motion.js'
 import { useFormState, validate } from '../hooks/useForm.js'
+import { supabase } from '../lib/supabase.js'
+import { nullIfEmpty, FORM_ERROR } from '../lib/forms.js'
 
 const steps = [
   {
@@ -167,11 +169,28 @@ export default function MisirBasvuru() {
     }
   }
 
-  const submit = () => {
+  const submit = async () => {
     const errs = validate(values, { kvkk: { required: true } })
     if (Object.keys(errs).length) return setErrors(er => ({ ...er, kvkk: 'Devam etmek için onaylamalısın.' }))
     setSending(true)
-    setTimeout(() => setDone(true), 1000)
+    const { error } = await supabase.from('misir_turu_basvurulari').insert({
+      ad_soyad: values.ad,
+      ogrenci_no: values.ogrNo,
+      sinif: values.sinif,
+      telefon: values.tel,
+      email: values.email,
+      pasaport: values.pasaport,
+      yurtdisi: values.yurtdisi,
+      heyecan: values.heyecan,
+      oda_tercihi: values.oda,
+      saglik_notu: nullIfEmpty(values.saglik),
+      kaynak: values.kaynak,
+      ek_not: nullIfEmpty(values.not),
+      kvkk_onay: values.kvkk,
+    })
+    setSending(false)
+    if (error) return setErrors(er => ({ ...er, form: FORM_ERROR }))
+    setDone(true)
   }
 
   const num = String(questionIndex).padStart(2, '0')
@@ -290,6 +309,7 @@ export default function MisirBasvuru() {
               Kişisel verilerimin tur başvurusu kapsamında işlenmesini kabul ediyorum.
             </label>
             {errors.kvkk && <p className="field-error">{errors.kvkk}</p>}
+            {errors.form && <p className="field-error">{errors.form}</p>}
             <div className="wizard-actions">
               <button className="btn btn-gold" onClick={submit} disabled={sending}>
                 <span>{sending ? 'Gönderiliyor…' : 'Başvuruyu Gönder'}</span>

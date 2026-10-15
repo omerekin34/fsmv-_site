@@ -52,11 +52,13 @@ export default function DuyuruDetay() {
         <div className="dd-hero-overlay" />
         <div className="container fad-hero-content">
           <Link to="/duyurular" className="fad-back"><ArrowLeft size={16} /> Tüm Duyurular</Link>
-          <span className="card-tag">{a.category}</span>
-          <span className={`ann-badge ${a.isEvent ? 'event' : 'info'}`}>
-            {a.isEvent ? 'Etkinlik' : 'Duyuru'}
-          </span>
-          {st !== 'info' && <span className={`ann-status ann-status--${st}`}>{statusLabel[st]}</span>}
+          <div className="fad-tags">
+            <span className="card-tag">{a.category}</span>
+            <span className={`ann-badge ${a.isEvent ? 'event' : 'info'}`}>
+              {a.isEvent ? 'Etkinlik' : 'Duyuru'}
+            </span>
+            {st !== 'info' && <span className={`ann-status ann-status--${st}`}>{statusLabel[st]}</span>}
+          </div>
           <h1>{a.title}</h1>
           <div className="fad-meta">
             <span><CalendarDays size={16} /> Yayın: {formatDate(a.dateISO)}</span>

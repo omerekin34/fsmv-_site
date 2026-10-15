@@ -7,15 +7,17 @@ import {
 } from 'lucide-react'
 import Reveal from '../components/Reveal.jsx'
 import { pageMotion } from '../motion.js'
-import { activities, getActivity } from '../data/activities.js'
+import { useActivities } from '../hooks/useActivities.js'
 import NotFound from './NotFound.jsx'
 
 const initials = name => name.split(' ').filter(Boolean).map(w => w[0]).slice(0, 2).join('').toLocaleUpperCase('tr')
 
 export default function FaaliyetDetay() {
   const { slug } = useParams()
+  const { activities, loading } = useActivities()
   const [copied, setCopied] = useState(false)
-  const a = getActivity(slug)
+  if (loading) return <motion.main className="page fa-detail" {...pageMotion} />
+  const a = activities.find(x => x.slug === slug)
   if (!a) return <NotFound />
 
   const idx = activities.findIndex(x => x.slug === slug)
@@ -45,7 +47,7 @@ export default function FaaliyetDetay() {
         <div className="fad-hero-overlay" />
         <div className="container fad-hero-content">
           <Link to="/faaliyetler" className="fad-back"><ArrowLeft size={16} /> Tüm Faaliyetler</Link>
-          <span className="card-tag">{a.category}</span>
+          <div className="fad-tags"><span className="card-tag">{a.category}</span></div>
           <h1>{a.title}</h1>
           <div className="fad-meta">
             <span><CalendarDays size={16} /> {a.date}</span>

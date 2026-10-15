@@ -3,12 +3,15 @@ import { CheckCircle2 } from 'lucide-react'
 import Modal from './Modal.jsx'
 import Field from './Field.jsx'
 import { useFormState, validate } from '../hooks/useForm.js'
+import { supabase } from '../lib/supabase.js'
+import { nullIfEmpty, FORM_ERROR } from '../lib/forms.js'
 import { announcements, getStatus } from '../data/announcements.js'
 
 const eventOptions = announcements.filter(a => getStatus(a) === 'open').map(a => a.title)
 
 export default function EventJoinModal({ announcement, onClose }) {
   const [done, setDone] = useState(false)
+  const [sending, setSending] = useState(false)
   const [lastAnn, setLastAnn] = useState(null)
   const { values, setValues, errors, setErrors, onChange } = useFormState({
     ad: '', ogrNo: '', tel: '', email: '', etkinlik: '', not: '',
@@ -20,7 +23,7 @@ export default function EventJoinModal({ announcement, onClose }) {
     if (announcement) setValues(v => ({ ...v, etkinlik: announcement.title }))
   }
 
-  const submit = e => {
+  const submit = async e => {
     e.preventDefault()
     const errs = validate(values, {
       ad: { required: true }, ogrNo: { required: true },
@@ -28,8 +31,18 @@ export default function EventJoinModal({ announcement, onClose }) {
       etkinlik: { required: true },
     })
     if (Object.keys(errs).length) return setErrors(errs)
-    setDone(false)
-    setTimeout(() => setDone(true), 1000)
+    setSending(true)
+    const { error } = await supabase.from('etkinlik_basvurulari').insert({
+      ad_soyad: values.ad,
+      ogrenci_no: values.ogrNo,
+      telefon: values.tel,
+      email: values.email,
+      etkinlik: values.etkinlik,
+      not_metni: nullIfEmpty(values.not),
+    })
+    setSending(false)
+    if (error) return setErrors({ form: FORM_ERROR })
+    setDone(true)
   }
 
   return (
@@ -54,7 +67,8 @@ export default function EventJoinModal({ announcement, onClose }) {
             </div>
             <Field label="Etkinlik Seçimi" name="etkinlik" as="select" options={eventOptions} value={values.etkinlik} onChange={onChange} error={errors.etkinlik} required />
             <Field label="Not" name="not" as="textarea" value={values.not} onChange={onChange} error={errors.not} />
-            <button className="btn btn-gold" style={{ width: '100%', justifyContent: 'center' }} type="submit"><span>Başvuruyu Gönder</span></button>
+            {errors.form && <p className="field-error" style={{ display: 'block', marginBottom: 14 }}>{errors.form}</p>}
+            <button className="btn btn-gold" style={{ width: '100%', justifyContent: 'center' }} type="submit" disabled={sending}><span>{sending ? 'Gönderiliyor...' : 'Başvuruyu Gönder'}</span></button>
           </form>
         </>
       )}

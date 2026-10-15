@@ -328,6 +328,7 @@ button { font-family: inherit; }
 .team-card { padding: 30px 20px; text-align: center; transition: all var(--dur) var(--ease); }
 .team-card:hover { transform: translateY(-6px); }
 .team-card img { width: 110px; height: 110px; border-radius: 50%; margin: 0 auto 16px; border: 3px solid var(--gold); object-fit: cover; }
+.team-avatar-fallback { width: 110px; height: 110px; border-radius: 50%; margin: 0 auto 16px; border: 3px solid var(--gold); background: var(--glass); display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--gold-light); }
 .team-card h3 { font-size: 1.02rem; }
 .team-role { color: var(--gold-light); font-size: 0.84rem; margin: 5px 0 14px; }
 .team-socials { display: flex; justify-content: center; gap: 12px; }
@@ -684,9 +685,12 @@ a.card-img { display: block; }
 .fad-hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .fad-hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(18, 3, 3, 0.45), rgba(18, 3, 3, 0.92)); }
 .fad-hero-content { position: relative; z-index: 1; padding-bottom: 42px; }
-.fad-back { display: inline-flex; align-items: center; gap: 7px; color: var(--gold-light); font-size: 0.85rem; font-weight: 600; margin-bottom: 16px; transition: color 0.4s; }
+.fad-back { display: inline-flex; align-items: center; gap: 7px; color: var(--gold-light); font-size: 0.85rem; font-weight: 600; margin-bottom: 18px; transition: color 0.4s; }
 .fad-back:hover { color: var(--gold); }
-.fad-hero-content h1 { font-size: clamp(1.7rem, 4.5vw, 2.8rem); margin: 14px 0 16px; }
+.fad-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }
+.fad-tags .card-tag, .fad-tags .ann-badge, .fad-tags .ann-status { margin: 0; }
+.fad-tags .ann-badge, .fad-tags .ann-status { padding: 4px 12px; }
+.fad-hero-content h1 { font-size: clamp(1.7rem, 4.5vw, 2.8rem); margin: 0 0 16px; }
 .fad-meta { display: flex; flex-wrap: wrap; gap: 18px; font-size: 0.9rem; color: rgba(255, 255, 255, 0.85); }
 .fad-meta span { display: inline-flex; align-items: center; gap: 7px; }
 .fad-meta svg { color: var(--gold); }

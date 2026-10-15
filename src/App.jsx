@@ -16,11 +16,13 @@ import MisirTuru from './pages/MisirTuru.jsx'
 import MisirBasvuru from './pages/MisirBasvuru.jsx'
 import UyeOl from './pages/UyeOl.jsx'
 import NotFound from './pages/NotFound.jsx'
+import AdminRoutes from './admin/AdminRoutes.jsx'
 
 export default function App() {
   const location = useLocation()
   const { pathname } = location
   useEffect(() => { window.scrollTo(0, 0) }, [pathname])
+  if (pathname.startsWith('/yonetim')) return <AdminRoutes />
   return (
     <>
       <Navbar />

@@ -6,6 +6,8 @@ import Reveal from '../components/Reveal.jsx'
 import { pageMotion } from '../motion.js'
 import Field from '../components/Field.jsx'
 import { useFormState, validate } from '../hooks/useForm.js'
+import { supabase } from '../lib/supabase.js'
+import { FORM_ERROR } from '../lib/forms.js'
 import { site } from '../data/site.js'
 
 export default function Iletisim() {
@@ -13,7 +15,7 @@ export default function Iletisim() {
   const [sending, setSending] = useState(false)
   const [toast, setToast] = useState(false)
 
-  const submit = e => {
+  const submit = async e => {
     e.preventDefault()
     const errs = validate(values, {
       ad: { required: true }, email: { required: true, email: true },
@@ -21,7 +23,16 @@ export default function Iletisim() {
     })
     if (Object.keys(errs).length) return setErrors(errs)
     setSending(true)
-    setTimeout(() => { setSending(false); setToast(true); setTimeout(() => setToast(false), 3500) }, 1000)
+    const { error } = await supabase.from('iletisim_mesajlari').insert({
+      ad_soyad: values.ad,
+      email: values.email,
+      konu: values.konu,
+      mesaj: values.mesaj,
+    })
+    setSending(false)
+    if (error) return setErrors({ form: FORM_ERROR })
+    setToast(true)
+    setTimeout(() => setToast(false), 3500)
   }
 
   return (
@@ -42,6 +53,7 @@ export default function Iletisim() {
                 <Field label="E-posta" name="email" type="email" value={values.email} onChange={onChange} error={errors.email} required />
                 <Field label="Konu" name="konu" value={values.konu} onChange={onChange} error={errors.konu} required />
                 <Field label="Mesaj" name="mesaj" as="textarea" value={values.mesaj} onChange={onChange} error={errors.mesaj} required />
+                {errors.form && <p className="field-error" style={{ display: 'block', marginBottom: 14 }}>{errors.form}</p>}
                 <button className="btn btn-gold" type="submit" disabled={sending}>
                   <span>{sending ? 'Gönderiliyor...' : 'Gönder'}</span><Send />
                 </button>

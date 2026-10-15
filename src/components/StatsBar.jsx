@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
-import { stats } from '../data/stats.js'
+import { buildStats } from '../data/stats.js'
+import { useActivities } from '../hooks/useActivities.js'
 
 function useCountUp(target, started, duration = 2000) {
   const [n, setN] = useState(0)
@@ -30,6 +31,8 @@ function HeroStat({ value, suffix, label, started }) {
 }
 
 export default function StatsBar({ delay = 0, className = '' }) {
+  const { activities } = useActivities()
+  const stats = buildStats(activities.length)
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, amount: 0.4 })
   const [started, setStarted] = useState(false)

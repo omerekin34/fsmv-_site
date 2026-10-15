@@ -1,12 +1,13 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Scale, ArrowRight, ChevronDown, Target, Compass, CheckCircle2 } from 'lucide-react'
+import { Scale, ArrowRight, ChevronDown, Target, Compass, CheckCircle2, Users } from 'lucide-react'
 import Reveal from '../components/Reveal.jsx'
 import StatsBar from '../components/StatsBar.jsx'
 import TeamCard from '../components/TeamCard.jsx'
 import { pageMotion } from '../motion.js'
 import { useActivities } from '../hooks/useActivities.js'
-import { announcements, dateParts, getStatus, statusLabel } from '../data/announcements.js'
+import { useAnnouncements } from '../hooks/useAnnouncements.js'
+import { dateParts, getStatus, statusLabel } from '../lib/announcements.js'
 import { mission } from '../data/about.js'
 import { useTeam } from '../hooks/useTeam.js'
 import { egyptTour } from '../data/egyptTour.js'
@@ -22,6 +23,7 @@ function SectionMore({ to, children }) {
 export default function Home() {
   const { activities } = useActivities()
   const latest = activities.slice(0, 3)
+  const { announcements } = useAnnouncements()
   const news = announcements.slice(0, 3)
   const { board } = useTeam()
   return (
@@ -132,6 +134,11 @@ export default function Home() {
                           : st !== 'info' && <span className={`ann-status ann-status--${st}`}>{statusLabel[st]}</span>}
                       </h3>
                       <p>{n.desc}</p>
+                      {n.isEvent && n.quota && (
+                        <div className="ann-meta">
+                          <span><Users size={14} /> Kontenjan: {n.approved} / {n.quota}</span>
+                        </div>
+                      )}
                       <Link to={`/duyurular/${n.slug}`} className="card-link">Detay <ArrowRight size={14} /></Link>
                     </div>
                   </article>

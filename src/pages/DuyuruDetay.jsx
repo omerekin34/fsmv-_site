@@ -1,27 +1,44 @@
-import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useMemo, useState } from 'react'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   ArrowLeft, ArrowRight, Ban, CalendarDays, CheckCircle2, Clock,
-  MapPin, Share2,
+  MapPin, Share2, Users,
 } from 'lucide-react'
 import Reveal from '../components/Reveal.jsx'
 import { pageMotion } from '../motion.js'
 import EventJoinModal from '../components/EventJoinModal.jsx'
 import NotFound from './NotFound.jsx'
-import {
-  announcements, dateParts, daysUntil, formatDate, getAnnouncement, getStatus, statusLabel,
-} from '../data/announcements.js'
+import { useAnnouncements } from '../hooks/useAnnouncements.js'
+import { dateParts, daysUntil, formatDate, getStatus, statusLabel } from '../lib/announcements.js'
 
 export default function DuyuruDetay() {
   const { slug } = useParams()
+  const [params] = useSearchParams()
   const [copied, setCopied] = useState(false)
   const [join, setJoin] = useState(null)
-  const a = getAnnouncement(slug)
-  const daysLeft = a && a.deadlineISO ? daysUntil(a.deadlineISO) : null
+  const { announcements, loading } = useAnnouncements()
+  const [autoOpened, setAutoOpened] = useState(false)
+
+  const a = useMemo(() => announcements.find(x => x.slug === slug), [announcements, slug])
+  const st = a ? getStatus(a) : null
+  const openEvents = useMemo(() => announcements.filter(x => getStatus(x) === 'open'), [announcements])
+
+  if (!autoOpened && !loading && a) {
+    setAutoOpened(true)
+    if (params.get('katil') === '1' && st === 'open') setJoin(a)
+  }
+
+  if (loading) {
+    return (
+      <motion.main className="page" {...pageMotion}>
+        <div className="container" style={{ padding: '80px 0', textAlign: 'center', color: 'var(--ink-dim)' }}>Yükleniyor…</div>
+      </motion.main>
+    )
+  }
   if (!a) return <NotFound />
 
-  const st = getStatus(a)
+  const daysLeft = a.deadlineISO ? daysUntil(a.deadlineISO) : null
   const active = st === 'open' || st === 'info'
 
   const idx = announcements.findIndex(x => x.slug === slug)
@@ -79,6 +96,7 @@ export default function DuyuruDetay() {
                 {st === 'closed' && `Bu etkinliğin başvuru süresi ${formatDate(a.deadlineISO)} tarihinde sona ermiştir.`}
                 {st === 'past' && `Bu etkinlik ${formatDate(a.eventDateISO)} tarihinde gerçekleşmiştir.`}
                 {st === 'expired' && 'Bu duyurunun geçerlilik süresi dolmuştur.'}
+                {st === 'full' && 'Bu etkinliğin kontenjanı dolmuştur.'}
               </span>
             </div>
           )}
@@ -113,7 +131,14 @@ export default function DuyuruDetay() {
                     {a.eventTime && <div className="fad-info-row"><span>Saat</span><strong>{a.eventTime}</strong></div>}
                     {a.location && <div className="fad-info-row"><span>Yer</span><strong>{a.location}</strong></div>}
                     {a.deadlineISO && <div className="fad-info-row"><span>Son Başvuru</span><strong>{formatDate(a.deadlineISO)}</strong></div>}
-                    {a.quota && <div className="fad-info-row"><span>Kontenjan</span><strong>{a.quota} kişi</strong></div>}
+                    {a.quota && (
+                      <>
+                        <div className="fad-info-row"><span>Kontenjan</span><strong>{a.approved} / {a.quota} kişi</strong></div>
+                        <div className="ann-quota-bar">
+                          <div className="ann-quota-fill" style={{ width: `${Math.min(100, (a.approved / a.quota) * 100)}%` }} />
+                        </div>
+                      </>
+                    )}
                   </>
                 )}
                 <div className="fad-info-row"><span>Durum</span><strong>{statusLabel[st]}</strong></div>
@@ -128,7 +153,7 @@ export default function DuyuruDetay() {
                     )}
                   </>
                 )}
-                {(st === 'closed' || st === 'past') && (
+                {(st === 'closed' || st === 'past' || st === 'full') && (
                   <span className="btn btn-disabled">{statusLabel[st]}</span>
                 )}
                 {!a.isEvent && (
@@ -167,6 +192,11 @@ export default function DuyuruDetay() {
                         </span>
                       </h3>
                       <p>{x.desc}</p>
+                      {x.isEvent && x.quota && (
+                        <div className="ann-meta">
+                          <span><Users size={14} /> Kontenjan: {x.approved} / {x.quota}</span>
+                        </div>
+                      )}
                       <Link to={`/duyurular/${x.slug}`} className="card-link">Detay <ArrowRight size={14} /></Link>
                     </div>
                   </article>
@@ -192,7 +222,7 @@ export default function DuyuruDetay() {
         </div>
       </section>
 
-      <EventJoinModal announcement={join} onClose={() => setJoin(null)} />
+      <EventJoinModal announcement={join} events={openEvents} onClose={() => setJoin(null)} />
     </motion.main>
   )
 }

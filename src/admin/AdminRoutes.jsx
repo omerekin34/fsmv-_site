@@ -8,6 +8,7 @@ import MisirTuruAdmin from './pages/MisirTuruAdmin.jsx'
 import Etkinlikler from './pages/Etkinlikler.jsx'
 import Ekip from './pages/Ekip.jsx'
 import Faaliyetler from './pages/Faaliyetler.jsx'
+import Duyurular from './pages/Duyurular.jsx'
 import Mesajlar from './pages/Mesajlar.jsx'
 
 export default function AdminRoutes() {
@@ -22,6 +23,7 @@ export default function AdminRoutes() {
           <Route path="etkinlikler" element={<Etkinlikler />} />
           <Route path="ekip" element={<Ekip />} />
           <Route path="faaliyetler" element={<Faaliyetler />} />
+          <Route path="duyurular" element={<Duyurular />} />
           <Route path="mesajlar" element={<Mesajlar />} />
         </Route>
       </Route>

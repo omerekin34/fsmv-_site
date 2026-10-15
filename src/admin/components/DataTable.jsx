@@ -19,7 +19,7 @@ const exportCsv = (columns, rows, name) => {
   URL.revokeObjectURL(url)
 }
 
-export default function DataTable({ table, columns, statusField, statusOptions = [], searchKeys = [], hasAdminNote = false }) {
+export default function DataTable({ table, columns, statusField, statusOptions = [], searchKeys = [], hasAdminNote = false, rowFilter, onRows, refreshKey }) {
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -34,16 +34,19 @@ export default function DataTable({ table, columns, statusField, statusOptions =
       .catch(e => { if (alive) setError(e.message || 'Veriler alınamadı.') })
       .finally(() => { if (alive) setLoading(false) })
     return () => { alive = false }
-  }, [table])
+  }, [table, refreshKey])
+
+  useEffect(() => { onRows?.(rows) }, [rows, onRows])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     return rows.filter(row => {
+      if (rowFilter && !rowFilter(row)) return false
       if (statusField && statusFilter !== 'all' && String(row[statusField]) !== statusFilter) return false
       if (!q) return true
       return searchKeys.some(k => String(row[k] ?? '').toLowerCase().includes(q))
     })
-  }, [rows, query, statusFilter, statusField, searchKeys])
+  }, [rows, query, statusFilter, statusField, searchKeys, rowFilter])
 
   const visibleCols = columns.filter(c => !c.hideInTable)
 

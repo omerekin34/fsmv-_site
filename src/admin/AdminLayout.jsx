@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate, Link } from 'react-router-dom'
-import { LayoutDashboard, Users, Plane, CalendarCheck, CalendarDays, Mail, LogOut, Menu, X, ExternalLink, UserCog } from 'lucide-react'
+import { LayoutDashboard, Users, Plane, CalendarCheck, CalendarDays, Megaphone, Mail, LogOut, Menu, X, ExternalLink, UserCog } from 'lucide-react'
 import { supabase } from '../lib/supabase.js'
 import { useSession } from './useSession.js'
 import '../styles/admin.css'
@@ -9,7 +9,8 @@ const navItems = [
   { to: '/yonetim', label: 'Panel', icon: LayoutDashboard, end: true },
   { to: '/yonetim/uyeler', label: 'Üyeler', icon: Users },
   { to: '/yonetim/misir-turu', label: 'Mısır Turu', icon: Plane },
-  { to: '/yonetim/etkinlikler', label: 'Etkinlikler', icon: CalendarCheck },
+  { to: '/yonetim/etkinlikler', label: 'Etkinlik Başvuruları', icon: CalendarCheck },
+  { to: '/yonetim/duyurular', label: 'Duyurular', icon: Megaphone },
   { to: '/yonetim/faaliyetler', label: 'Faaliyetler', icon: CalendarDays },
   { to: '/yonetim/ekip', label: 'Ekip', icon: UserCog },
   { to: '/yonetim/mesajlar', label: 'Mesajlar', icon: Mail },

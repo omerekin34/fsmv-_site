@@ -12,6 +12,7 @@
   --dur: 0.8s;
   --ink: rgba(255, 255, 255, 0.82);
   --ink-dim: rgba(255, 255, 255, 0.6);
+  --topbar-h: 0px;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -86,7 +87,7 @@ button { font-family: inherit; }
 
 .container { width: min(1200px, 92%); margin: 0 auto; }
 
-.page { padding-top: 90px; min-height: 100vh; }
+.page { padding-top: calc(90px + var(--topbar-h)); min-height: 100vh; }
 
 .page-head { text-align: center; padding: 60px 0 40px; }
 .page-head h1 { font-size: clamp(2rem, 5vw, 3.2rem); letter-spacing: 0.04em; }
@@ -160,6 +161,30 @@ button { font-family: inherit; }
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
 }
 .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 74px; }
+
+/* ---------- Deadline Bar ---------- */
+.deadline-bar {
+  height: 56px;
+  background: linear-gradient(90deg, #3a0606, #5a0a0a);
+  border-bottom: 1px solid var(--gold-border);
+  box-shadow: 0 4px 18px rgba(0,0,0,0.45);
+  overflow: hidden;
+}
+.deadline-bar-inner { display: flex; align-items: center; gap: 16px; height: 100%; white-space: nowrap; }
+.deadline-bar-date { display: flex; flex-direction: column; text-align: right; flex: none; color: var(--white); font-size: 0.9rem; line-height: 1.25; }
+.deadline-bar-date strong { color: var(--gold); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.14em; }
+.deadline-bar-count { display: flex; gap: 10px; flex: none; }
+.deadline-bar-cell { display: flex; flex-direction: column; align-items: center; }
+.deadline-bar-cell b { font-family: 'Cinzel', serif; font-size: 1.35rem; font-weight: 700; color: var(--white); font-variant-numeric: tabular-nums; line-height: 1; }
+.deadline-bar-cell i { font-style: normal; font-size: 0.62rem; letter-spacing: 0.1em; color: var(--gold-light); opacity: 0.8; margin-top: 3px; }
+.deadline-bar-title { overflow: hidden; text-overflow: ellipsis; min-width: 0; color: var(--ink); font-size: 0.85rem; }
+.deadline-bar-quota { flex: none; font-size: 0.8rem; color: var(--ink-dim); }
+.deadline-bar-btn {
+  flex: none; margin-left: auto; padding: 7px 18px; border-radius: 999px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: var(--anthracite);
+  font-size: 0.8rem; font-weight: 700; transition: opacity 0.3s;
+}
+.deadline-bar-btn:hover { opacity: 0.88; }
 .nav-brand { display: flex; align-items: center; gap: 12px; }
 .nav-brand img { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--gold); }
 .nav-brand span { font-family: 'Cinzel', serif; font-weight: 700; color: var(--white); font-size: 1.05rem; letter-spacing: 0.04em; }
@@ -200,7 +225,7 @@ button { font-family: inherit; }
 .nav-cta { display: flex; align-items: center; gap: 14px; }
 .hamburger { display: none; background: none; border: none; color: var(--gold); cursor: pointer; }
 .mobile-menu {
-  position: fixed; top: 74px; left: 0; right: 0; z-index: 99;
+  position: fixed; top: calc(74px + var(--topbar-h)); left: 0; right: 0; z-index: 99;
   background: rgba(18, 3, 3, 0.97); border-bottom: 1px solid var(--gold-border);
   padding: 20px 5%; display: flex; flex-direction: column; gap: 4px;
 }
@@ -210,7 +235,7 @@ button { font-family: inherit; }
 .mobile-menu .mobile-join { display: inline-flex; align-items: center; gap: 8px; }
 
 /* ---------- Hero ---------- */
-.hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 120px 5% 120px; position: relative; overflow: hidden; }
+.hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: calc(120px + var(--topbar-h)) 5% 120px; position: relative; overflow: hidden; }
 .hero-inner { max-width: 860px; position: relative; z-index: 1; }
 .hero-logo { width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--gold); position: relative; z-index: 1; margin: 0; }
 .hero-logo-wrap { position: relative; width: 120px; height: 120px; margin: 0 auto 28px; }
@@ -411,6 +436,9 @@ button { font-family: inherit; }
 .ann-status--open { background: rgba(212,175,55,0.16); color: var(--gold-light); }
 .ann-status--closed, .ann-status--expired { background: rgba(255,255,255,0.08); color: var(--ink-dim); }
 .ann-status--past { background: rgba(0,0,0,0.35); color: rgba(255,255,255,0.55); }
+.ann-status--full { background: rgba(192,57,43,0.25); color: #f5b7b1; }
+.ann-quota-bar { height: 5px; border-radius: 99px; background: rgba(255,255,255,0.1); overflow: hidden; margin-top: 8px; }
+.ann-quota-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--gold), var(--gold-dark)); }
 .ann-card--inactive { opacity: 0.72; }
 .ann-card--inactive .ann-date { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.12); }
 .ann-card--inactive .ann-date .day { color: var(--ink-dim); }
@@ -424,7 +452,7 @@ button { font-family: inherit; }
 /* ---------- Duyuru Detay ---------- */
 .dd-hero {
   position: relative; min-height: 380px; display: flex; align-items: flex-end; overflow: hidden;
-  margin-top: -90px; padding-top: 90px;
+  margin-top: calc(-90px - var(--topbar-h)); padding-top: calc(90px + var(--topbar-h));
   background: radial-gradient(ellipse at 50% 0%, rgba(212,175,55,0.18), transparent 55%), linear-gradient(180deg, var(--bordo-dark), var(--anthracite));
 }
 .dd-hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(18, 3, 3, 0.45), rgba(18, 3, 3, 0.92)); }
@@ -680,7 +708,7 @@ a.card-img { display: block; }
 .fad-hero {
   position: relative; height: 52vh; min-height: 380px;
   display: flex; align-items: flex-end; overflow: hidden;
-  margin-top: -90px; padding-top: 90px;
+  margin-top: calc(-90px - var(--topbar-h)); padding-top: calc(90px + var(--topbar-h));
 }
 .fad-hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .fad-hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(18, 3, 3, 0.45), rgba(18, 3, 3, 0.92)); }
@@ -752,7 +780,7 @@ a.card-img { display: block; }
 .egypt-cta .btn { display: inline-flex; align-items: center; gap: 8px; }
 
 /* ---------- Başvuru Sihirbazı ---------- */
-.wizard-page { min-height: 100vh; display: flex; flex-direction: column; padding-top: 110px; padding-bottom: 60px; }
+.wizard-page { min-height: 100vh; display: flex; flex-direction: column; padding-top: calc(110px + var(--topbar-h)); padding-bottom: 60px; }
 .wizard-top { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
 .wizard-back-link { font-size: 0.84rem; color: var(--ink-dim); transition: color 0.4s var(--ease); }
 .wizard-back-link:hover { color: var(--gold-light); }
@@ -843,13 +871,20 @@ a.card-img { display: block; }
   .fad-nav { flex-direction: column; }
   .fad-nav-item { max-width: 100%; }
   .fad-nav-item.next { margin-left: 0; }
+  .deadline-bar-title, .deadline-bar-quota { display: none; }
 }
 @media (max-width: 560px) {
   .values-grid { grid-template-columns: 1fr; }
   .fa-toolbar { padding: 16px; }
   .fa-toolbar-row { flex-wrap: wrap; }
   .fad-meta { gap: 12px; font-size: 0.82rem; }
-  .wizard-page { padding-top: 90px; }
+  .deadline-bar-inner { gap: 10px; }
+  .deadline-bar-date { font-size: 0.78rem; }
+  .deadline-bar-date strong { font-size: 0.6rem; }
+  .deadline-bar-count { gap: 6px; }
+  .deadline-bar-cell b { font-size: 1.1rem; }
+  .deadline-bar-btn { padding: 6px 12px; font-size: 0.72rem; }
+  .wizard-page { padding-top: calc(90px + var(--topbar-h)); }
   .wizard-card { padding: 28px 20px; }
   .wizard-options { grid-template-columns: 1fr; }
   .wizard-actions .btn { width: 100%; justify-content: center; }

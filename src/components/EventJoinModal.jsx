@@ -5,11 +5,9 @@ import Field from './Field.jsx'
 import { useFormState, validate } from '../hooks/useForm.js'
 import { supabase } from '../lib/supabase.js'
 import { nullIfEmpty, FORM_ERROR } from '../lib/forms.js'
-import { announcements, getStatus } from '../data/announcements.js'
+import { invalidateAnnouncements } from '../lib/announcements.js'
 
-const eventOptions = announcements.filter(a => getStatus(a) === 'open').map(a => a.title)
-
-export default function EventJoinModal({ announcement, onClose }) {
+export default function EventJoinModal({ announcement, events = [], onClose }) {
   const [done, setDone] = useState(false)
   const [sending, setSending] = useState(false)
   const [lastAnn, setLastAnn] = useState(null)
@@ -38,10 +36,15 @@ export default function EventJoinModal({ announcement, onClose }) {
       telefon: values.tel,
       email: values.email,
       etkinlik: values.etkinlik,
+      duyuru_id: events.find(ev => ev.title === values.etkinlik)?.id ?? null,
       not_metni: nullIfEmpty(values.not),
     })
     setSending(false)
-    if (error) return setErrors({ form: FORM_ERROR })
+    if (error) {
+      const msg = /kontenjan|süresi/i.test(error.message || '') ? error.message : FORM_ERROR
+      return setErrors({ form: msg })
+    }
+    invalidateAnnouncements()
     setDone(true)
   }
 
@@ -65,7 +68,7 @@ export default function EventJoinModal({ announcement, onClose }) {
               <Field label="Telefon" name="tel" value={values.tel} onChange={onChange} error={errors.tel} required />
               <Field label="E-posta" name="email" type="email" value={values.email} onChange={onChange} error={errors.email} required />
             </div>
-            <Field label="Etkinlik Seçimi" name="etkinlik" as="select" options={eventOptions} value={values.etkinlik} onChange={onChange} error={errors.etkinlik} required />
+            <Field label="Etkinlik Seçimi" name="etkinlik" as="select" options={events.map(ev => ev.title)} value={values.etkinlik} onChange={onChange} error={errors.etkinlik} required />
             <Field label="Not" name="not" as="textarea" value={values.not} onChange={onChange} error={errors.not} />
             {errors.form && <p className="field-error" style={{ display: 'block', marginBottom: 14 }}>{errors.form}</p>}
             <button className="btn btn-gold" style={{ width: '100%', justifyContent: 'center' }} type="submit" disabled={sending}><span>{sending ? 'Gönderiliyor...' : 'Başvuruyu Gönder'}</span></button>

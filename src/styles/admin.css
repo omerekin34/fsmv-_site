@@ -567,8 +567,8 @@
 .adm-thumb-empty { background: rgba(0, 0, 0, 0.35); border: 1px solid var(--gold-border); }
 .adm-thumb-lg { width: 96px; height: 64px; flex-shrink: 0; }
 
-.adm-cell-wrap { white-space: normal; max-width: 260px; }
-.adm-cell-wrap strong { display: block; }
+.adm-cell-wrap { white-space: normal; min-width: 220px; }
+.adm-cell-wrap strong, .adm-cell-wrap .adm-slug { display: block; white-space: normal; overflow-wrap: anywhere; max-width: 280px; }
 .adm-slug { font-size: 0.75rem; }
 
 .adm-row-actions { display: flex; gap: 6px; }
@@ -643,3 +643,22 @@
   .adm-topbar { padding-left: 60px; }
   .adm-content { padding: 20px 16px; }
 }
+
+/* ---------- Duyurular / Etkinlik kontenjan ---------- */
+.adm-quota { display: flex; flex-direction: column; gap: 4px; min-width: 90px; }
+.adm-quota-bar { display: block; height: 4px; border-radius: 99px; background: rgba(255,255,255,0.1); overflow: hidden; width: 70px; }
+.adm-quota-fill { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--gold), var(--gold-dark)); }
+
+.adm-ev-cards { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+.adm-ev-card {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+  padding: 14px 16px; border-radius: 12px; min-width: 210px; max-width: 300px;
+  text-align: left; cursor: pointer; font: inherit; color: var(--ink);
+  border: 1px solid transparent; transition: border-color 0.3s;
+}
+.adm-ev-card:hover { border-color: var(--gold-border); }
+.adm-ev-card.active { border-color: var(--gold); }
+.adm-ev-card strong { font-size: 0.88rem; color: var(--white); }
+.adm-ev-card .adm-dim { font-size: 0.78rem; }
+.adm-ev-quota { display: flex; flex-direction: column; gap: 5px; font-size: 0.8rem; }
+.adm-ev-selected { margin: -6px 0 14px; }

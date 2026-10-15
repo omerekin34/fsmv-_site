@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Users, Plane, CalendarCheck, CalendarDays, Mail, UserCog } from 'lucide-react'
+import { Users, Plane, CalendarCheck, CalendarDays, Megaphone, Mail, UserCog } from 'lucide-react'
 import { countRows, fetchRows } from '../api.js'
 import { fmtDate } from '../format.js'
 
@@ -12,6 +12,7 @@ const tables = [
   { table: 'iletisim_mesajlari', label: 'Mesajlar', icon: Mail, to: '/yonetim/mesajlar', sub: { label: 'okunmadı', filters: { okundu: false } } },
   { table: 'ekip_uyeleri', label: 'Ekip Üyeleri', icon: UserCog, to: '/yonetim/ekip', sub: { label: 'aktif', filters: { aktif: true } } },
   { table: 'faaliyetler', label: 'Faaliyetler', icon: CalendarDays, to: '/yonetim/faaliyetler', sub: { label: 'yayında', filters: { yayinda: true } } },
+  { table: 'duyurular', label: 'Duyurular', icon: Megaphone, to: '/yonetim/duyurular', sub: { label: 'yayında', filters: { yayinda: true } } },
 ]
 
 export default function Dashboard() {

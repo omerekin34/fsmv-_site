@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, Landmark, Menu, UserPlus, X } from 'lucide-react'
+import DeadlineBar from './DeadlineBar.jsx'
 
 const kurumsal = [
   { to: '/hakkimizda', label: 'Hakkımızda' },
@@ -25,6 +26,7 @@ export default function Navbar() {
 
   return (
     <header className={`navbar ${scrolled ? 'scrolled' : ''}`}>
+      <DeadlineBar />
       <div className="container nav-inner">
         <Link to="/" className="nav-brand">
           <img src="/logo.png" alt="FSMVÜ Hukuk Kulübü" />

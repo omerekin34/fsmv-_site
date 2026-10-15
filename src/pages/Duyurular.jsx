@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ArrowRight, CalendarDays, MapPin } from 'lucide-react'
+import { ArrowRight, CalendarDays, MapPin, Users } from 'lucide-react'
 import Reveal from '../components/Reveal.jsx'
 import { pageMotion } from '../motion.js'
 import EventJoinModal from '../components/EventJoinModal.jsx'
-import { announcements, dateParts, formatDate, getStatus, statusLabel } from '../data/announcements.js'
+import { useAnnouncements } from '../hooks/useAnnouncements.js'
+import { dateParts, formatDate, getStatus, isActive, statusLabel } from '../lib/announcements.js'
 
 const filters = ['Tümü', 'Etkinlikler', 'Duyurular', 'Aktif', 'Geçmiş']
 
@@ -13,20 +14,24 @@ const noticeText = {
   closed: 'Bu etkinliğin başvuru süresi dolmuştur.',
   past: 'Bu etkinlik sona ermiştir.',
   expired: 'Bu duyurunun geçerlilik süresi dolmuştur.',
+  full: 'Bu etkinliğin kontenjanı dolmuştur.',
 }
 
 export default function Duyurular() {
   const [modal, setModal] = useState(null)
   const [filter, setFilter] = useState('Tümü')
+  const { announcements, loading, error } = useAnnouncements()
+
+  const openEvents = useMemo(() => announcements.filter(a => getStatus(a) === 'open'), [announcements])
 
   const list = useMemo(() => announcements.filter(a => {
     const st = getStatus(a)
     if (filter === 'Etkinlikler') return a.isEvent
     if (filter === 'Duyurular') return !a.isEvent
-    if (filter === 'Aktif') return st === 'open' || st === 'info'
+    if (filter === 'Aktif') return isActive(a)
     if (filter === 'Geçmiş') return st === 'closed' || st === 'past' || st === 'expired'
     return true
-  }), [filter])
+  }), [announcements, filter])
 
   return (
     <motion.main className="page" {...pageMotion}>
@@ -45,10 +50,13 @@ export default function Duyurular() {
           </div>
 
           <div className="ann-list">
-            {list.length === 0 && (
+            {loading ? (
+              <div className="glass-card fa-empty"><p>Yükleniyor…</p></div>
+            ) : error ? (
+              <div className="glass-card fa-empty"><p>Duyurular yüklenemedi. Lütfen daha sonra tekrar deneyin.</p></div>
+            ) : list.length === 0 ? (
               <div className="glass-card fa-empty"><p>Bu kriterlere uygun duyuru bulunamadı.</p></div>
-            )}
-            {list.map((a, i) => {
+            ) : list.map((a, i) => {
               const st = getStatus(a)
               const dp = dateParts(a.dateISO)
               const active = st === 'open' || st === 'info'
@@ -74,6 +82,7 @@ export default function Duyurular() {
                         <div className="ann-meta">
                           <span><CalendarDays size={14} /> {formatDate(a.eventDateISO)}{a.eventTime ? ` · ${a.eventTime}` : ''}</span>
                           {a.location && <span><MapPin size={14} /> {a.location}</span>}
+                          {a.quota && <span><Users size={14} /> Kontenjan: {a.approved} / {a.quota}</span>}
                         </div>
                       )}
                       <div className="ann-actions">
@@ -81,6 +90,7 @@ export default function Duyurular() {
                         {st === 'open' && (
                           <button className="btn btn-gold btn-join" onClick={() => setModal(a)}><span>Katıl</span></button>
                         )}
+                        {st === 'full' && <span className="btn btn-disabled" style={{ width: 'auto', marginTop: 0, padding: '12px 24px' }}>Kontenjan Doldu</span>}
                       </div>
                       {noticeText[st] && <p className="ann-notice">{noticeText[st]}</p>}
                     </div>
@@ -92,7 +102,7 @@ export default function Duyurular() {
         </div>
       </section>
 
-      <EventJoinModal announcement={modal} onClose={() => setModal(null)} />
+      <EventJoinModal announcement={modal} events={openEvents} onClose={() => setModal(null)} />
     </motion.main>
   )
 }

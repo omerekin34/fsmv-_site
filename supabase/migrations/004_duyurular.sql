@@ -92,7 +92,7 @@ grant select on public.duyuru_kontenjan to anon, authenticated;
 --    (panelde hata mesajı görünür).
 -- ---------------------------------------------------------------------------
 create or replace function public.etkinlik_basvuru_kontrol()
-returns trigger language plpgsql as $$
+returns trigger language plpgsql security definer set search_path = public as $$
 declare
   d        public.duyurular%rowtype;
   onayli   integer;

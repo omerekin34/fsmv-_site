@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, Landmark, Menu, UserPlus, X } from 'lucide-react'
+import { ChevronDown, ChevronRight, Landmark, Menu, UserPlus, X } from 'lucide-react'
 import DeadlineBar from './DeadlineBar.jsx'
 
 const kurumsal = [
@@ -90,7 +90,8 @@ export default function Navbar() {
             <span className="mobile-group-label">KEŞFET</span>
             <NavLink to="/faaliyetler">Faaliyetler</NavLink>
             <NavLink to="/duyurular">Duyurular</NavLink>
-            <NavLink to="/misir-turu">Mısır Turu</NavLink>
+            <NavLink to="/misir-turu" className="mobile-egypt"><Landmark size={16} /> Mısır Turu <ChevronRight size={16} /></NavLink>
+            <span className="mobile-menu-divider" aria-hidden="true" />
             <NavLink to="/uye-ol" className="mobile-join"><UserPlus size={16} /> Üye Ol</NavLink>
           </motion.nav>
         )}

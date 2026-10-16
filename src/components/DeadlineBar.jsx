@@ -22,7 +22,7 @@ export default function DeadlineBar() {
   }, [])
 
   useEffect(() => {
-    document.documentElement.style.setProperty('--topbar-h', d ? '56px' : '0px')
+    document.documentElement.style.setProperty('--topbar-h', d ? 'var(--deadline-h)' : '0px')
     return () => document.documentElement.style.setProperty('--topbar-h', '0px')
   }, [d])
 
@@ -33,17 +33,19 @@ export default function DeadlineBar() {
   return (
     <div className="deadline-bar">
       <div className="container deadline-bar-inner">
-        <span className="deadline-bar-date">
-          <strong>BAŞVURU SON TARİHİ</strong>
-          {formatDate(d.deadlineISO)}
-        </span>
-        <span className="deadline-bar-count">
-          {cells(diff).map(([label, v]) => (
-            <span key={label} className="deadline-bar-cell">
-              <b>{pad(v)}</b>
-              <i>{label}</i>
-            </span>
-          ))}
+        <span className="deadline-bar-meta">
+          <span className="deadline-bar-date">
+            <strong>SON BAŞVURU</strong>
+            {formatDate(d.deadlineISO)}
+          </span>
+          <span className="deadline-bar-count">
+            {cells(diff).map(([label, v]) => (
+              <span key={label} className="deadline-bar-cell">
+                <b>{pad(v)}</b>
+                <i>{label}</i>
+              </span>
+            ))}
+          </span>
         </span>
         <span className="deadline-bar-title">{d.title}</span>
         {d.quota && <span className="deadline-bar-quota">Kontenjan {d.approved}/{d.quota}</span>}

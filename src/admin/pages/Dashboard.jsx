@@ -7,7 +7,7 @@ import { fmtDate } from '../format.js'
 
 const tables = [
   { table: 'uyeler', label: 'Üye Başvuruları', icon: Users, to: '/yonetim/uyeler', sub: { label: 'beklemede', filters: { durum: 'beklemede' } } },
-  { table: 'misir_turu_basvurulari', label: 'Mısır Turu', icon: Plane, to: '/yonetim/misir-turu', sub: { label: 'beklemede', filters: { durum: 'beklemede' } } },
+  { table: 'misir_turu_basvurulari', label: 'Mısır Turu Başvuruları', icon: Plane, to: '/yonetim/misir-basvurulari', sub: { label: 'kesinleşti', filters: { durum: 'kesinlesti' } } },
   { table: 'etkinlik_basvurulari', label: 'Etkinlik Başvuruları', icon: CalendarCheck, to: '/yonetim/etkinlikler' },
   { table: 'iletisim_mesajlari', label: 'Mesajlar', icon: Mail, to: '/yonetim/mesajlar', sub: { label: 'okunmadı', filters: { okundu: false } } },
   { table: 'ekip_uyeleri', label: 'Ekip Üyeleri', icon: UserCog, to: '/yonetim/ekip', sub: { label: 'aktif', filters: { aktif: true } } },

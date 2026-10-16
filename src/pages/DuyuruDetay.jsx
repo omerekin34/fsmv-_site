@@ -12,6 +12,8 @@ import NotFound from './NotFound.jsx'
 import { useAnnouncements } from '../hooks/useAnnouncements.js'
 import { dateParts, daysUntil, formatDate, getStatus, statusLabel } from '../lib/announcements.js'
 
+const initials = name => name.split(' ').filter(Boolean).map(w => w[0]).slice(0, 2).join('').toLocaleUpperCase('tr')
+
 export default function DuyuruDetay() {
   const { slug } = useParams()
   const [params] = useSearchParams()
@@ -115,6 +117,25 @@ export default function DuyuruDetay() {
                       <li key={i}><CheckCircle2 size={20} /> <span>{d}</span></li>
                     ))}
                   </ul>
+                </Reveal>
+              )}
+
+              {a.speakers.length > 0 && (
+                <Reveal>
+                  <h2 className="fad-h">Konuşmacılar</h2>
+                  <div className="fad-speakers">
+                    {a.speakers.map((s, i) => (
+                      <div key={i} className="glass-card fad-speaker">
+                        {s.photo
+                          ? <img className="fad-avatar fad-avatar-img" src={s.photo} alt={s.name} loading="lazy" />
+                          : <div className="fad-avatar">{initials(s.name)}</div>}
+                        <div>
+                          <strong>{s.name}</strong>
+                          {s.title && <span>{s.title}</span>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </Reveal>
               )}
             </div>

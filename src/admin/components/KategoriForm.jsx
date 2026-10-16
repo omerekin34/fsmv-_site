@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronUp, ChevronDown, Pencil, Trash2, Plus, Check } from 'lucide-react'
 import { insertRow, updateRow, deleteRow } from '../api.js'
 import { invalidateActivities } from '../../lib/activities.js'
+import { toast } from '../toast.js'
 
 export default function KategoriForm({ open, categories, setCategories, onRenamed, onClose }) {
   return (
@@ -41,10 +42,12 @@ function Drawer({ categories, setCategories, onRenamed, onClose }) {
       await updateRow('faaliyet_kategorileri', c.id, { sira: other.sira })
       await updateRow('faaliyet_kategorileri', other.id, { sira: c.sira })
       invalidateActivities()
+      toast.success('Sıralama güncellendi.')
     } catch (e) {
       patch(c.id, { sira: c.sira })
       patch(other.id, { sira: other.sira })
       setError(e.message || 'Sıralama güncellenemedi.')
+      toast.error(e.message || 'Sıralama güncellenemedi.')
     }
   }
 
@@ -57,8 +60,10 @@ function Drawer({ categories, setCategories, onRenamed, onClose }) {
       onRenamed(c.ad, ad)
       setEditing(null)
       invalidateActivities()
+      toast.success('Kategori güncellendi.')
     } catch (e) {
       setError(e.message || 'Yeniden adlandırma başarısız.')
+      toast.error(e.message || 'Yeniden adlandırma başarısız.')
     }
   }
 
@@ -68,8 +73,10 @@ function Drawer({ categories, setCategories, onRenamed, onClose }) {
       await deleteRow('faaliyet_kategorileri', c.id)
       setCategories(cs => cs.filter(x => x.id !== c.id))
       invalidateActivities()
+      toast.success('Kategori silindi.')
     } catch {
       setError('Bu kategoriye bağlı faaliyetler var, önce onları taşıyın.')
+      toast.error('Bu kategoriye bağlı faaliyetler var, önce onları taşıyın.')
     }
   }
 
@@ -82,8 +89,10 @@ function Drawer({ categories, setCategories, onRenamed, onClose }) {
       setCategories(cs => [...cs, row])
       setNewAd('')
       invalidateActivities()
+      toast.success('Kategori eklendi.')
     } catch (e) {
       setError(e.message || 'Kategori eklenemedi.')
+      toast.error(e.message || 'Kategori eklenemedi.')
     }
   }
 

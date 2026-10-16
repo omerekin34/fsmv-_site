@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { ChevronUp, ChevronDown, Eye, EyeOff, Pencil, Trash2, Plus, Mail } from 'lucide-react'
 import { LinkedinIcon } from '../../components/SocialIcons.jsx'
 import { fetchRows, updateRow, deleteRow } from '../api.js'
+import { toast } from '../toast.js'
 import EkipForm from '../components/EkipForm.jsx'
 
 const tabs = [
@@ -39,10 +40,12 @@ export default function Ekip() {
     try {
       await updateRow('ekip_uyeleri', m.id, { sira: other.sira })
       await updateRow('ekip_uyeleri', other.id, { sira: m.sira })
+      toast.success('Sıralama güncellendi.')
     } catch (e) {
       patch(m.id, { sira: m.sira })
       patch(other.id, { sira: other.sira })
       setError(e.message || 'Sıralama güncellenemedi.')
+      toast.error(e.message || 'Sıralama güncellenemedi.')
     }
   }
 
@@ -50,9 +53,11 @@ export default function Ekip() {
     patch(m.id, { aktif: !m.aktif })
     try {
       await updateRow('ekip_uyeleri', m.id, { aktif: !m.aktif })
+      toast.success(m.aktif ? 'Üye pasifleştirildi.' : 'Üye aktifleştirildi.')
     } catch (e) {
       patch(m.id, { aktif: m.aktif })
       setError(e.message || 'Güncelleme başarısız.')
+      toast.error(e.message || 'Güncelleme başarısız.')
     }
   }
 
@@ -61,8 +66,10 @@ export default function Ekip() {
     try {
       await deleteRow('ekip_uyeleri', m.id)
       setRows(rs => rs.filter(r => r.id !== m.id))
+      toast.success('Üye silindi.')
     } catch (e) {
       setError(e.message || 'Silme başarısız.')
+      toast.error(e.message || 'Silme başarısız.')
     }
   }
 

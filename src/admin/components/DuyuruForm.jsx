@@ -1,8 +1,10 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Save } from 'lucide-react'
-import { insertRow, updateRow } from '../api.js'
+import { X, Save, Plus, Trash2 } from 'lucide-react'
+import { insertRow, updateRow, uploadPublicFile } from '../api.js'
 import { invalidateAnnouncements } from '../../lib/announcements.js'
+import { toast } from '../toast.js'
+import DateInput from './DateInput.jsx'
 
 const slugify = s => s
   .toLocaleLowerCase('tr')
@@ -15,6 +17,7 @@ const slugRe = /^[a-z0-9]+(-[a-z0-9]+)*$/
 const lines = t => t.split('\n').map(x => x.trim()).filter(Boolean)
 const paras = t => t.split(/\n\s*\n/).map(x => x.trim()).filter(Boolean)
 const emptyToNull = v => (v || '').trim() || null
+const initials = name => name.trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase()
 const today = () => new Date().toISOString().slice(0, 10)
 
 const kategoriler = ['Yarışma', 'Kariyer', 'Gezi', 'Genel', 'Üyelik', 'Yönetim']
@@ -55,9 +58,35 @@ function Form({ row, onClose, onSaved }) {
   })
   const [icerik, setIcerik] = useState((row?.icerik || []).join('\n\n'))
   const [detaylar, setDetaylar] = useState((row?.detaylar || []).join('\n'))
+  const [konusmacilar, setKonusmacilar] = useState(
+    (row?.konusmacilar || []).map(k => ({ ad: k.ad || '', unvan: k.unvan || '', foto_url: k.foto_url || '', file: null, preview: '' }))
+  )
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const slugTouched = useRef(!!row)
+
+  const konusmacilarRef = useRef(konusmacilar)
+  useEffect(() => { konusmacilarRef.current = konusmacilar })
+  useEffect(() => () => {
+    konusmacilarRef.current.forEach(k => { if (k.preview) URL.revokeObjectURL(k.preview) })
+  }, [])
+
+  const setSpeaker = (i, patch) => setKonusmacilar(ks => ks.map((k, j) => (j === i ? { ...k, ...patch } : k)))
+
+  const pickSpeakerFile = (i, e) => {
+    const f = e.target.files[0] || null
+    setKonusmacilar(ks => ks.map((k, j) => {
+      if (j !== i) return k
+      if (k.preview) URL.revokeObjectURL(k.preview)
+      return { ...k, file: f, preview: f ? URL.createObjectURL(f) : '' }
+    }))
+  }
+
+  const removeSpeaker = i => setKonusmacilar(ks => {
+    const k = ks[i]
+    if (k?.preview) URL.revokeObjectURL(k.preview)
+    return ks.filter((_, j) => j !== i)
+  })
 
   const set = key => e => setForm(f => ({ ...f, [key]: e.target.type === 'checkbox' ? e.target.checked : e.target.value }))
 
@@ -89,6 +118,18 @@ function Form({ row, onClose, onSaved }) {
     setError('')
     try {
       const isEvent = form.tur === 'etkinlik'
+      const speakers = await Promise.all(
+        konusmacilar
+          .filter(k => (k.ad || '').trim())
+          .map(async k => {
+            let foto = (k.foto_url || '').trim() || null
+            if (k.file) {
+              const ext = k.file.name.split('.').pop()
+              foto = await uploadPublicFile('duyurular', `konusmacilar/${crypto.randomUUID()}.${ext}`, k.file)
+            }
+            return { ad: k.ad.trim(), unvan: (k.unvan || '').trim(), foto_url: foto }
+          })
+      )
       const values = {
         baslik: form.baslik.trim(),
         slug,
@@ -104,6 +145,7 @@ function Form({ row, onClose, onSaved }) {
         gecerlilik: !isEvent ? form.gecerlilik || null : null,
         icerik: paras(icerik),
         detaylar: lines(detaylar),
+        konusmacilar: speakers,
         iletisim: emptyToNull(form.iletisim),
         yayinda: form.yayinda,
       }
@@ -114,9 +156,11 @@ function Form({ row, onClose, onSaved }) {
         onSaved(await insertRow('duyurular', values))
       }
       invalidateAnnouncements()
+      toast.success(row ? 'Duyuru güncellendi.' : 'Duyuru eklendi.')
       onClose()
     } catch (e) {
       setError(e.message || 'Kaydetme başarısız.')
+      toast.error(e.message || 'Kaydetme başarısız.')
     } finally {
       setSaving(false)
     }
@@ -162,7 +206,7 @@ function Form({ row, onClose, onSaved }) {
         </div>
         <label className="adm-field">
           <span>Yayın Tarihi *</span>
-          <input type="date" value={form.yayin_tarihi} onChange={set('yayin_tarihi')} />
+          <DateInput value={form.yayin_tarihi} onChange={set('yayin_tarihi')} />
         </label>
         <label className="adm-field">
           <span>Özet</span>
@@ -173,7 +217,7 @@ function Form({ row, onClose, onSaved }) {
             <div className="adm-faal-2col">
               <label className="adm-field">
                 <span>Etkinlik Tarihi *</span>
-                <input type="date" value={form.etkinlik_tarihi} onChange={set('etkinlik_tarihi')} />
+                <DateInput value={form.etkinlik_tarihi} onChange={set('etkinlik_tarihi')} />
               </label>
               <label className="adm-field">
                 <span>Saat</span>
@@ -187,7 +231,7 @@ function Form({ row, onClose, onSaved }) {
             <div className="adm-faal-2col">
               <label className="adm-field">
                 <span>Son Başvuru</span>
-                <input type="date" value={form.son_basvuru} onChange={set('son_basvuru')} />
+                <DateInput value={form.son_basvuru} onChange={set('son_basvuru')} />
               </label>
               <label className="adm-field">
                 <span>Kontenjan (boş = sınırsız)</span>
@@ -198,9 +242,36 @@ function Form({ row, onClose, onSaved }) {
         ) : (
           <label className="adm-field">
             <span>Geçerlilik Tarihi</span>
-            <input type="date" value={form.gecerlilik} onChange={set('gecerlilik')} />
+            <DateInput value={form.gecerlilik} onChange={set('gecerlilik')} />
           </label>
         )}
+        <div className="adm-field">
+          <span>Konuşmacılar</span>
+          {konusmacilar.map((k, i) => {
+            const shown = k.preview || k.foto_url
+            return (
+              <div className="adm-speaker-card" key={i}>
+                {shown
+                  ? <img className="adm-speaker-photo" src={shown} alt="" />
+                  : <div className="adm-speaker-photo adm-speaker-photo-empty">{k.ad.trim() ? initials(k.ad) : '?'}</div>}
+                <div className="adm-speaker-fields">
+                  <div className="adm-speaker-row">
+                    <input value={k.ad} onChange={e => setSpeaker(i, { ad: e.target.value })} placeholder="Ad Soyad" />
+                    <input value={k.unvan} onChange={e => setSpeaker(i, { unvan: e.target.value })} placeholder="Ünvan" />
+                  </div>
+                  <div className="adm-speaker-row">
+                    <input type="file" accept="image/jpeg,image/png,image/webp" onChange={e => pickSpeakerFile(i, e)} />
+                    <input value={k.foto_url} onChange={e => setSpeaker(i, { foto_url: e.target.value, file: null, preview: '' })} placeholder="veya fotoğraf URL'si" />
+                  </div>
+                </div>
+                <button type="button" className="adm-icon-btn adm-icon-btn-danger" onClick={() => removeSpeaker(i)} aria-label="Konuşmacıyı sil"><Trash2 size={14} /></button>
+              </div>
+            )
+          })}
+          <button type="button" className="adm-btn adm-btn-outline adm-btn-auto" onClick={() => setKonusmacilar(ks => [...ks, { ad: '', unvan: '', foto_url: '', file: null, preview: '' }])}>
+            <Plus size={14} /><span>Konuşmacı Ekle</span>
+          </button>
+        </div>
         <label className="adm-field">
           <span>İçerik (paragraflar boş satırla ayrılır)</span>
           <textarea className="adm-textarea" rows={6} value={icerik} onChange={e => setIcerik(e.target.value)} />

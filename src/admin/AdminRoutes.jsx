@@ -5,6 +5,7 @@ import Giris from './pages/Giris.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import Uyeler from './pages/Uyeler.jsx'
 import MisirTuruAdmin from './pages/MisirTuruAdmin.jsx'
+import MisirBasvurulari from './pages/MisirBasvurulari.jsx'
 import Etkinlikler from './pages/Etkinlikler.jsx'
 import Ekip from './pages/Ekip.jsx'
 import Faaliyetler from './pages/Faaliyetler.jsx'
@@ -20,6 +21,7 @@ export default function AdminRoutes() {
           <Route index element={<Dashboard />} />
           <Route path="uyeler" element={<Uyeler />} />
           <Route path="misir-turu" element={<MisirTuruAdmin />} />
+          <Route path="misir-basvurulari" element={<MisirBasvurulari />} />
           <Route path="etkinlikler" element={<Etkinlikler />} />
           <Route path="ekip" element={<Ekip />} />
           <Route path="faaliyetler" element={<Faaliyetler />} />

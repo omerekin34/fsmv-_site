@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Save } from 'lucide-react'
 import { insertRow, updateRow, uploadPublicFile } from '../api.js'
+import { toast } from '../toast.js'
 
 const initials = name => name.trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase()
 
@@ -76,9 +77,11 @@ function Form({ member, defaultGrup, members, onClose, onSaved }) {
         const sira = Math.max(0, ...members.filter(m => m.grup === form.grup).map(m => m.sira)) + 1
         onSaved(await insertRow('ekip_uyeleri', { ...values, sira }))
       }
+      toast.success(member ? 'Ekip üyesi güncellendi.' : 'Ekip üyesi eklendi.')
       onClose()
     } catch (e) {
       setError(e.message || 'Kaydetme başarısız.')
+      toast.error(e.message || 'Kaydetme başarısız.')
     } finally {
       setSaving(false)
     }

@@ -1,11 +1,13 @@
 import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, ChevronRight, CheckCircle2, CornerDownLeft } from 'lucide-react'
+import { ChevronLeft, ChevronRight, CheckCircle2, CornerDownLeft, Lock } from 'lucide-react'
 import { pageMotion, ease } from '../motion.js'
 import { useFormState, validate } from '../hooks/useForm.js'
 import { supabase } from '../lib/supabase.js'
 import { nullIfEmpty, FORM_ERROR } from '../lib/forms.js'
+import { useMisirTuru } from '../hooks/useMisirTuru.js'
+import { misirStatus, misirStatusLabel, invalidateMisirTuru } from '../lib/misirTuru.js'
 
 const steps = [
   {
@@ -109,6 +111,7 @@ export default function MisirBasvuru() {
   const [sending, setSending] = useState(false)
   const [done, setDone] = useState(false)
   const advancing = useRef(false)
+  const { tour } = useMisirTuru()
   const { values, setValues, errors, setErrors } = useFormState({
     ad: '', ogrNo: '', sinif: '', tel: '', email: '', pasaport: '',
     yurtdisi: '', heyecan: [], oda: '', saglik: '', kaynak: '', not: '', kvkk: false,
@@ -189,20 +192,60 @@ export default function MisirBasvuru() {
       kvkk_onay: values.kvkk,
     })
     setSending(false)
-    if (error) return setErrors(er => ({ ...er, form: FORM_ERROR }))
+    if (error) {
+      const msg = /kontenjan|süresi|kapalı|zaten/i.test(error.message || '') ? error.message : FORM_ERROR
+      return setErrors(er => ({ ...er, form: msg }))
+    }
+    invalidateMisirTuru()
     setDone(true)
   }
 
   const num = String(questionIndex).padStart(2, '0')
+
+  if (!tour) {
+    return (
+      <motion.main className="egypt-page wizard-page" {...pageMotion}>
+        <div className="wizard-stage"><div className="wizard-card glass-card" /></div>
+      </motion.main>
+    )
+  }
+
+  const status = misirStatus(tour)
+  const kalan = tour.kontenjan ? Math.max(0, tour.kontenjan - (tour.kesinlesen ?? 0)) : null
+
+  if (status !== 'open' && !done) {
+    return (
+      <motion.main className="egypt-page wizard-page" {...pageMotion}>
+        <div className="wizard-stage">
+          <div className="wizard-card glass-card">
+            <div className="success-panel wizard-success">
+              <Lock size={52} />
+              <h3>{misirStatusLabel[status]}</h3>
+              <p>{status === 'full'
+                ? 'Mısır turu kontenjanı dolmuştur. İptal durumunda duyurular sayfasından ilan edeceğiz.'
+                : 'Mısır turu başvuruları şu anda alınmamaktadır. Duyuruları takip et.'}</p>
+              <div className="wizard-success-actions">
+                <Link to="/misir-turu" className="btn btn-outline"><span>Tur sayfasına dön</span></Link>
+                <Link to="/duyurular" className="btn btn-gold"><span>Duyurular</span></Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.main>
+    )
+  }
 
   const renderBody = () => {
     const err = current.key && errors[current.key]
     switch (current.type) {
       case 'intro':
         return (
-          <div className="wizard-actions">
-            <button className="btn btn-gold" onClick={next}><span>Başlayalım</span><ChevronRight size={18} /></button>
-          </div>
+          <>
+            {kalan !== null && <p className="wizard-hint">{kalan} yer kaldı</p>}
+            <div className="wizard-actions">
+              <button className="btn btn-gold" onClick={next}><span>Başlayalım</span><ChevronRight size={18} /></button>
+            </div>
+          </>
         )
       case 'text':
       case 'email':

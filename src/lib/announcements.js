@@ -1,7 +1,7 @@
 import { supabase } from './supabase.js'
 
 const months = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara']
-const monthsLong = [
+export const monthsLong = [
   'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
   'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık',
 ]
@@ -67,6 +67,7 @@ export const mapAnnouncement = (r, k) => ({
   content: r.icerik || [],
   details: r.detaylar || [],
   contact: r.iletisim,
+  speakers: (r.konusmacilar || []).map(s => ({ name: s.ad, title: s.unvan, photo: s.foto_url || null })),
 })
 
 export function nextDeadline(list) {

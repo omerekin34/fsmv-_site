@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Trash2, Save } from 'lucide-react'
 import { updateRow, deleteRow } from '../api.js'
 import { cellText, statusSlug } from '../format.js'
+import { toast } from '../toast.js'
 
 const parseStatus = v => (v === 'true' ? true : v === 'false' ? false : v)
 
@@ -17,8 +18,15 @@ export default function DetailDrawer({ table, row, columns, statusField, statusO
     try {
       await updateRow(table, row.id, patch)
       onUpdated({ ...row, ...patch })
+      if (statusField in patch) {
+        const label = statusOptions.find(o => String(o.value) === String(patch[statusField]))?.label ?? patch[statusField]
+        toast.success(`Durum güncellendi: ${label}`)
+      } else if ('admin_notu' in patch) {
+        toast.success('Yönetici notu kaydedildi.')
+      }
     } catch (e) {
       setError(e.message || 'Güncelleme başarısız.')
+      toast.error(e.message || 'Güncelleme başarısız.')
     } finally {
       setSaving(false)
     }
@@ -31,8 +39,10 @@ export default function DetailDrawer({ table, row, columns, statusField, statusO
     try {
       await deleteRow(table, row.id)
       onDeleted(row.id)
+      toast.success('Kayıt silindi.')
     } catch (e) {
       setError(e.message || 'Silme başarısız.')
+      toast.error(e.message || 'Silme başarısız.')
       setSaving(false)
     }
   }

@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Search, Eye, EyeOff, Pencil, Trash2, Plus, X } from 'lucide-react'
 import { fetchRows, updateRow, deleteRow } from '../api.js'
 import { months, formatDate, invalidateActivities } from '../../lib/activities.js'
+import { toast } from '../toast.js'
 import FaaliyetForm from '../components/FaaliyetForm.jsx'
 import KategoriForm from '../components/KategoriForm.jsx'
 
@@ -58,9 +59,11 @@ export default function Faaliyetler() {
     try {
       await updateRow('faaliyetler', r.id, { yayinda: !r.yayinda })
       invalidateActivities()
+      toast.success(r.yayinda ? 'Taslağa alındı.' : 'Yayına alındı.')
     } catch (e) {
       patch(r.id, { yayinda: r.yayinda })
       setError(e.message || 'Güncelleme başarısız.')
+      toast.error(e.message || 'Güncelleme başarısız.')
     }
   }
 
@@ -70,8 +73,10 @@ export default function Faaliyetler() {
       await deleteRow('faaliyetler', r.id)
       setRows(rs => rs.filter(x => x.id !== r.id))
       invalidateActivities()
+      toast.success('Faaliyet silindi.')
     } catch (e) {
       setError(e.message || 'Silme başarısız.')
+      toast.error(e.message || 'Silme başarısız.')
     }
   }
 

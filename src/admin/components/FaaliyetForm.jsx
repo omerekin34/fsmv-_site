@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Save, Plus, Trash2 } from 'lucide-react'
 import { insertRow, updateRow, uploadPublicFile } from '../api.js'
 import { invalidateActivities } from '../../lib/activities.js'
+import { toast } from '../toast.js'
+import DateInput from './DateInput.jsx'
 
 const slugify = s => s
   .toLocaleLowerCase('tr')
@@ -89,6 +91,7 @@ function Form({ row, categories, onClose, onSaved }) {
       setGaleri(g => [...(g ? g.split('\n').filter(x => x.trim()) : []), ...urls].join('\n'))
     } catch (err) {
       setError(err.message || 'Görsel yüklenemedi.')
+      toast.error(err.message || 'Görsel yüklenemedi.')
     } finally {
       e.target.value = ''
     }
@@ -136,9 +139,11 @@ function Form({ row, categories, onClose, onSaved }) {
         onSaved(await insertRow('faaliyetler', values))
       }
       invalidateActivities()
+      toast.success(row ? 'Faaliyet güncellendi.' : 'Faaliyet eklendi.')
       onClose()
     } catch (e) {
       setError(e.message || 'Kaydetme başarısız.')
+      toast.error(e.message || 'Kaydetme başarısız.')
     } finally {
       setSaving(false)
     }
@@ -175,7 +180,7 @@ function Form({ row, categories, onClose, onSaved }) {
         <div className="adm-faal-2col">
           <label className="adm-field">
             <span>Tarih *</span>
-            <input type="date" value={form.tarih} onChange={set('tarih')} />
+            <DateInput value={form.tarih} onChange={set('tarih')} />
           </label>
           <label className="adm-field">
             <span>Saat</span>

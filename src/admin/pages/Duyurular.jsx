@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { Search, Eye, EyeOff, Pencil, Trash2, Plus, X, Users } from 'lucide-react'
 import { fetchRows, updateRow, deleteRow } from '../api.js'
 import { formatDate, invalidateAnnouncements } from '../../lib/announcements.js'
+import { toast } from '../toast.js'
 import DuyuruForm from '../components/DuyuruForm.jsx'
 
 const trLower = s => (s || '').toLocaleLowerCase('tr')
@@ -62,9 +63,11 @@ export default function Duyurular() {
     try {
       await updateRow('duyurular', r.id, { yayinda: !r.yayinda })
       invalidateAnnouncements()
+      toast.success(r.yayinda ? 'Taslağa alındı.' : 'Yayına alındı.')
     } catch (e) {
       patch(r.id, { yayinda: r.yayinda })
       setError(e.message || 'Güncelleme başarısız.')
+      toast.error(e.message || 'Güncelleme başarısız.')
     }
   }
 
@@ -74,8 +77,10 @@ export default function Duyurular() {
       await deleteRow('duyurular', r.id)
       setRows(rs => rs.filter(x => x.id !== r.id))
       invalidateAnnouncements()
+      toast.success('Duyuru silindi.')
     } catch (e) {
       setError(e.message || 'Silme başarısız.')
+      toast.error(e.message || 'Silme başarısız.')
     }
   }
 

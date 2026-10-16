@@ -1,4 +1,5 @@
 export const egyptTour = {
+  route: ['İstanbul', 'Kahire', 'Giza & Sakkara', 'Luksor & Karnak', 'İstanbul'],
   highlights: [
     'Giza Piramitleri ve Sfenks rehberli turu',
     'Kahire Üniversitesi Hukuk Fakültesi akademik ziyareti',
@@ -9,27 +10,27 @@ export const egyptTour = {
   ],
   program: [
     {
-      day: '1. Gün', title: 'İstanbul – Kahire',
+      day: '1. Gün', title: 'İstanbul – Kahire', meta: 'Uçuş · Otel',
       desc: 'İstanbul Havalimanı’nda buluşma ve Kahire’ye uçuş. Otele yerleşme, akşam serbest zaman ve tanışma programı.',
     },
     {
-      day: '2. Gün', title: 'Giza Piramitleri & Sfenks',
+      day: '2. Gün', title: 'Giza Piramitleri & Sfenks', meta: 'Rehberli gezi',
       desc: 'Keops, Kefren ve Mikerinos piramitleri ile Büyük Sfenks’in rehberli gezisi. Öğleden sonra Sakkara antik bölgesi.',
     },
     {
-      day: '3. Gün', title: 'Mısır Müzesi & Khan el-Khalili',
+      day: '3. Gün', title: 'Mısır Müzesi & Khan el-Khalili', meta: 'Müze · Çarşı',
       desc: 'Dünyaca ünlü Mısır Müzesi ziyareti, ardından tarihi Khan el-Khalili çarşısında serbest zaman.',
     },
     {
-      day: '4. Gün', title: 'Kahire Üniversitesi Hukuk Fakültesi',
+      day: '4. Gün', title: 'Kahire Üniversitesi Hukuk Fakültesi', meta: 'Akademik ziyaret',
       desc: 'Kahire Üniversitesi Hukuk Fakültesi akademik ziyareti; Mısırlı hukuk öğrencileriyle karşılaştırmalı hukuk söyleşisi ve kampüs turu.',
     },
     {
-      day: '5. Gün', title: 'Luksor & Karnak – Nil Turu',
+      day: '5. Gün', title: 'Luksor & Karnak – Nil Turu', meta: 'İç hat uçuş · Nil',
       desc: 'Sabah uçuşuyla Luksor’a geçiş. Karnak ve Luksor tapınakları gezisi, gün batımında Nil Nehri’nde feluka tekne turu.',
     },
     {
-      day: '6. Gün', title: 'Dönüş',
+      day: '6. Gün', title: 'Dönüş', meta: 'Dönüş uçuşu',
       desc: 'Otelde kahvaltının ardından Kahire’ye dönüş ve İstanbul’a uçuş. Program sonu.',
     },
   ],
@@ -38,6 +39,20 @@ export const egyptTour = {
     { title: 'Ulaşım', desc: 'İstanbul–Kahire gidiş-dönüş uçak bileti, Kahire–Luksor iç hat uçuşu ve tüm transferler dahildir.' },
     { title: 'Rehberlik', desc: 'Program boyunca Türkçe konuşan profesyonel rehber ve kulüp görevlisi eşliğinde seyahat.' },
     { title: 'Vize & Pasaport', desc: 'Mısır vizesi kapıda alınabilmektedir. Pasaportunuzun en az 6 ay geçerliliği olmalıdır.' },
+  ],
+  included: [
+    'İstanbul–Kahire gidiş-dönüş uçak bileti',
+    'Kahire–Luksor iç hat uçuşu',
+    '5 gece konaklama (kahvaltı dahil)',
+    'Tüm transferler',
+    'Türkçe rehberlik hizmeti',
+    'Programdaki müze ve ören yeri girişleri',
+  ],
+  excluded: [
+    'Mısır vize ücreti',
+    'Öğle ve akşam yemekleri',
+    'Kişisel harcamalar',
+    'Seyahat sağlık sigortası (önerilir)',
   ],
   gallery: [
     'https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?w=800&q=80',
